@@ -1,0 +1,48 @@
+package event_ticketing;
+
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.SQLException;
+
+public class Transaction_Main {
+	 static final String JDBC_DRIVER = "com.mysql.jdbc.Driver";  
+	 static final String DB_URL = "jdbc:mysql://localhost/event_ticketing";
+	 static final String USER = "root";
+	 static final String PASS = "thanks";
+	
+	public static void main(String args[])
+	{
+		Connection conn = null;
+		try
+		{
+			Class.forName("com.mysql.jdbc.Driver");
+			conn = DriverManager.getConnection(DB_URL,USER,PASS);
+			TransactionDAO_JDBC transactdao = new TransactionDAO_JDBC(conn);
+			String trans_id = "TR00000004";
+			String bank_id = "B000000001";
+			String user_id = "U000000002";
+			transactdao.getTransactionByBank(bank_id);
+			Transaction transact = transactdao.getTransactionById(trans_id);
+			if(transact!=null)
+			{
+				transact.showTransaction();
+			}
+			else
+				System.out.println("No such transaction has occured");
+			Transaction newTransaction = transactdao.performNewTransaction(trans_id, user_id, bank_id);
+			newTransaction.setTransDate("2014-12-16");
+			newTransaction.setTransTime("20:00:00");
+			newTransaction.setAmount(500);
+			transactdao.addTransaction(newTransaction);
+			conn.close();
+		}
+		catch(SQLException se)
+		{
+			se.printStackTrace();
+		}
+		catch(ClassNotFoundException ex)
+		{
+			ex.printStackTrace();
+		} 
+	}
+}
